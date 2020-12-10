@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <span>Home</span>
+    <span>Account</span>
   </div>
 </template>
 
@@ -8,6 +8,6 @@
 // @ is an alias to /src
 
 export default {
-  name: "Home"
+  name: "Account"
 };
 </script>
