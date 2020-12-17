@@ -26,7 +26,7 @@ export default {
   methods: {
     login() {
       axios
-        .get("http://localhost:3000/login", {
+        .post("http://localhost:3000/login", {
           email: this.email,
           password: this.password,
         })
@@ -36,6 +36,8 @@ export default {
             message: `${r.status}: Successfully logged in`,
             type: 'success',
             });
+            this.$store.commit('setUser', r.data)
+            localStorage.setItem('user', JSON.stringify(r.data));
             this.$router.push('account')
         })
         .catch((error) => {
@@ -44,7 +46,7 @@ export default {
             type: 'error',
             });
         });
-    },
+    }
   }
 };
 </script>

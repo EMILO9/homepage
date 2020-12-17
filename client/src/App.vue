@@ -20,6 +20,10 @@ export default {
     ...mapGetters([
       'user'
     ])
+  },
+  created () {
+    let user = localStorage.getItem('user');
+    this.$store.commit('setUser', JSON.parse(user))
   }
 }
 </script>
