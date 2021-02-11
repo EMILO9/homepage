@@ -1,12 +1,11 @@
 <template>
-  <div class="home">
-    <span>Signup</span>
-    <br />
-    <input type="email" placeholder="Email" v-model="email" />
-    <br />
-    <input type="password" placeholder="Password" v-model="password" />
-    <br />
-    <button @click="signup">Signup</button>
+  <div class="signup">
+    <div class="box">
+      <div class="boxText">Signup</div>
+      <input class="boxInput" type="email" placeholder="Email" v-model="email" />
+    <input class="boxInput" type="password" placeholder="Password" v-model="password" />
+    <button class="boxButton" @click="signup">Signup</button>
+    </div>
   </div>
 </template>
 <script>
@@ -29,7 +28,6 @@ export default {
           password: this.password,
         })
         .then((r) => {
-          console.log(r.data.ops[0])
           Vue.$toast.open({
             message: `${r.status}: User created`,
             type: 'success',

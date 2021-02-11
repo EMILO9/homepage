@@ -5,6 +5,7 @@ import Login from "../views/Login.vue";
 import Signup from "../views/Signup.vue";
 import Account from "../views/Account.vue";
 import cantReach from "../views/cantReach.vue";
+import Media from "../views/Media.vue";
 import store from '../store/index'
 Vue.use(VueRouter);
 
@@ -30,6 +31,11 @@ const routes = [
     component: Account
   },
   {
+    path: "/media",
+    name: "Media",
+    component: Media
+  },
+  {
     path: "*",
     component: cantReach
   }
@@ -40,7 +46,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.name === 'Account' && !store.state.user) next({ name: 'Login' }) 
+  if (to.name === 'Account' && !store.state.user) next({ name: 'Home' }) 
   else next()
 })
 

@@ -1,14 +1,35 @@
 <template>
-  <div class="home">
-    <span>Account</span>
-    <p>Token: {{ user.token }}</p>
-    <p>ID: {{ user.user._id }}</p>
-    <p>Email: {{ user.user.email }}</p>
-    <p>Admin: {{ user.user.admin }}</p>
-    <button @click="getPCS">get pcs</button>
-      <li v-for="(pc, index) in pcs" :key="pc+index"><span v-if="index+1 < 10">0</span>{{index+1}}. Raspberry Pi</li>
-    <button @click="logout">Logout</button>
-    <button>Add pc (admin only)</button>
+  <div class="account">
+    <div class="userInfo">
+      <div class="info">
+        <div class="infoIcon"><i class="fas fa-key"></i></div>
+        <div class="infoText">{{ truncate(user.token, 15) }} (Expires in: 30:00)</div>
+      </div>
+      <div class="info">
+        <div class="infoIcon"><i class="fas fa-id-card"></i></div>
+        <div class="infoText">{{ user.user._id }}</div>
+      </div>
+      <div class="info">
+        <div class="infoIcon"><i class="fas fa-envelope"></i></div>
+        <div class="infoText">{{ user.user.email }}</div>
+      </div>
+      <div class="info">
+        <div class="infoIcon"><i class="fas fa-shield-alt"></i></div>
+        <div class="infoText"><span v-if="user.user.admin">Yes</span><span v-else>No</span></div>
+      </div>
+    </div>
+    <div class="pcs">
+      <div class="pc" v-for="(p, index) in pcs" :key="p+index">
+        <div class="pcImage"></div>
+        <div class="pcText">{{p.name}}</div>
+        <div class="pcButtons">
+          <div class="pcButton">
+            <div class="pcButtonIcon"><i class="fas fa-photo-video"></i></div>
+            <div class="pcButtonText" @click="goToMedia('/media', p)">MEDIA</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -24,16 +45,14 @@ export default {
       pcs: null
     }
   },
+  created () {
+    this.getPCS()
+  },
   computed: {
     // mix the getters into computed with object spread operator
     ...mapGetters(["user"]),
   },
   methods: {
-    logout() {
-      localStorage.removeItem("user");
-      this.$store.commit("setUser", null);
-      this.$router.push("home");
-    },
     getPCS() {
       let config = {
         headers: {
@@ -44,6 +63,11 @@ export default {
         .get("http://localhost:3000/private", config)
         .then((r) => { // Change later
         this.pcs = r.data
+        console.log(r.data)
+        Vue.$toast.open({
+            message: `${r.status}: Successfully fetched all pcs`,
+            type: 'success',
+            });
         })
         .catch((error) => {
           Vue.$toast.open({
@@ -51,6 +75,13 @@ export default {
             type: 'error',
             });
         });
+    },
+    truncate(string, max) {
+      if (string.length > max) return string.slice(0, max) + "...";
+    },
+    goToMedia (route, pc) {
+      this.$store.commit('setMedia', pc)
+      this.$router.push(route);
     }
   },
 };

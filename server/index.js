@@ -13,6 +13,11 @@ const bodyParser = require('body-parser')
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken')
 const path = require('path');
+const fs = require('fs');
+const { v4: uuidv4 } = require('uuid');
+const AWS = require('aws-sdk')
+const { getVideoDurationInSeconds } = require('get-video-duration')
+
 
 //Middleware
 app.use(morgan('tiny'))
@@ -30,7 +35,7 @@ mongoClient.connect(
     console.log("Connected to Database");
     const db = client.db("database");
     const users = db.collection("users");
-    const pcs = db.collection("pcs")
+    const raspberrypi = db.collection("raspberrypi's")
 
     app.post('/signup', [
       body('email').isEmail().withMessage('must be a valid email adress'),
@@ -51,15 +56,13 @@ mongoClient.connect(
     });
 
     app.post('/login', (req, res) => {
-      console.log(req.body)
       let { email, password } = req.body
       users.findOne({ email: email }).then(response => {
         if (!response) res.status(400).send("Email doesnt exists")
         else bcrypt.compare(password, response.password, function (err, result) {
           if (!result) res.status(400).send("Wrong password")
           else {
-            console.log(response)
-            let { _id, email, admin } = response
+            let { _id, email, admin} = response
             let user = { _id, email, admin}
             jwt.sign(user, secretKey, (err, token) => {
               res.status(200).send({ token, user })
@@ -73,18 +76,40 @@ mongoClient.connect(
       jwt.verify(req.token, secretKey, (err, authData) => {
         if (err) res.status(403).send('No access token set')
         else {
-          res.send([...Array(10).keys()])
+          if (!authData.admin) {
+            raspberrypi.find({userAccess: { $in: [authData.email] }}).toArray().then(r => {
+              if (r.length === 0) res.status(400).send('You dont have access to any pcs')
+              else res.status(200).send(r)
+            }).catch(err => res.status(400).send(err))
+          }
+          else raspberrypi.find({}).toArray().then(r => res.status(200).send(r)).catch(err => res.status(400).send(err))
         }
       })
     })
 
-    app.post('add-pcs', (req, res) => {
-      let {} = req.body
-      if (admin) pcs.insertOne({}).then(r => {
-        res.status(200).send("PC successfully added.")
+    app.post('/upload', verifyToken, (req, res) => {
+      jwt.verify(req.token, secretKey, (err, authData) => {
+        // const stream = fs.createReadStream('http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4')
+        // const fileName = `media_${uuidv4()}`
+        if (err) res.status(403).send('No access token set')
+        else {
+          let convertToDate = (timestamp) => new Date(timestamp * 1000)
+          let d1 = convertToDate(authData.iat)
+          let d2 = convertToDate(1613433600)
+          console.log()
+        }
       })
-      else res.status(400).send("Only admin can add new PC's")
+  })
+
+  app.get('/get-media', verifyToken, (req, res) => {
+    let s3 = new AWS.S3({accessKeyId: 'AKIAJH6ZPJJ4KGOPPAAQ', secretAccessKey: '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', Bucket: 'storemedia1'})
+    jwt.verify(req.token, secretKey, (err, authData) => {
+      if (err) res.status(403).send('No access token set')
+      else {
+        raspberrypi.find({userAccess: { $in: [authData.email] }}).toArray().then(r => res.send(r))
+      }
     })
+  })
 
     app.get('*', (req, res) => {
       res.sendFile(__dirname, '/dist/index.html');
@@ -100,7 +125,6 @@ mongoClient.connect(
 
 // Verify Token
 function verifyToken(req, res, next) {
-  console.log(req.headers)
   // Get auth header value
   const bearerHeader = req.headers['authorization'];
   // Check if bearer is undefined
@@ -119,15 +143,3 @@ function verifyToken(req, res, next) {
   }
 
 }
-
-
-// {
-//   "name": "Raspberry #1"
-//   "allowedUsersById": [13535346, 14235653, 154253628],
-//   "media": [{type: "video", duration: 24000, src: "lion.mp4"}, {type: "image", duration: 5000, src: "wolf.png"}],
-//   "currentCompany": "Elkjøp",
-//   "address": "Husmoveien 12",
-//   "postCode": 3246,
-//   "country": "Norway",
-//   "city": "Skien"
-// }

@@ -5,16 +5,21 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    user: null
+    user: null,
+    selectedMedia: null
   },
   mutations: {
     setUser (state, payload) {
       state.user = payload
+    },
+    setMedia (state, payload) {
+      state.selectedMedia = payload
     }
   },
   actions: {},
   modules: {},
   getters: {
-    user: (state) => state.user
+    user: (state) => state.user,
+    selectedMedia: (state) => state.selectedMedia
   }
 });

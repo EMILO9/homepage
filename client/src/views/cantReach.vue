@@ -1,7 +1,10 @@
 <template>
-  <div class="home">
-    <span>404</span>
-    <p>{{getRoute()}} Doesnt exist</p>
+  <div class="cantReach">
+    <div class="cantReachMid">
+      <div class="cantReachPageIcon"><i class="fas fa-sad-tear"></i></div>
+      <div class="cantReachTitle">404</div>
+      <div class="cantReachPage">Sorry! the page {{getRoute()}} doesn't exist.</div>
+    </div>
   </div>
 </template>
 

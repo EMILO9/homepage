@@ -1,12 +1,11 @@
 <template>
-  <div class="home">
-    <span>Login</span>
-    <br>
-    <input type="email" placeholder="Email" v-model="email">
-    <br>
-    <input type="password" placeholder="Password" v-model="password">
-    <br>
-    <button @click="login">Login</button>
+  <div class="login">
+    <div class="box">
+      <div class="boxText">Login</div>
+      <input type="email" placeholder="Email" v-model="email" class="boxInput">
+    <input type="password" placeholder="Password" v-model="password" class="boxInput">
+    <button @click="login" class="boxButton">Login</button>
+    </div>
   </div>
 </template>
 
@@ -31,7 +30,6 @@ export default {
           password: this.password,
         })
         .then((r) => {
-          console.log(r)
           Vue.$toast.open({
             message: `${r.status}: Successfully logged in`,
             type: 'success',
