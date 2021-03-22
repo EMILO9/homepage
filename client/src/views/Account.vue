@@ -19,16 +19,8 @@
       </div>
     </div>
     <div class="pcs">
-      <div class="pc" v-for="(p, index) in pcs" :key="p+index">
-        <div class="pcImage"></div>
-        <div class="pcText">{{p.name}}</div>
-        <div class="pcButtons">
-          <div class="pcButton">
-            <div class="pcButtonIcon"><i class="fas fa-photo-video"></i></div>
-            <div class="pcButtonText" @click="goToMedia('/media', p)">MEDIA</div>
-          </div>
-        </div>
-      </div>
+      <div class="pcAdd" @click="addPc">+</div>
+      <div class="pc" v-for="(p, index) in pcs" :key="p+index" @click="goToMedia('/media', p)">{{p.name}}</div>
     </div>
   </div>
 </template>
@@ -82,6 +74,17 @@ export default {
     goToMedia (route, pc) {
       this.$store.commit('setMedia', pc)
       this.$router.push(route);
+    },
+    addPc () {
+      let config = {
+        headers: {
+          authorization: `bearer ${this.user.token}`,
+        },
+      };
+      axios.post('http://localhost:3000/addPc', {}, config)
+      .then(r => console.log(r.status))
+      .catch(error => console.log(error.response.data))
+      this.getPCS()
     }
   },
 };

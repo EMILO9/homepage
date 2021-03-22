@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="Sidebar">
-      <div class="Logo">LOGO</div>
+      <div class="Logo">MEDIA9</div>
       <div class="Menu">
         <div class="menuItem" @click="goTo('/')">
           <div class="Icon"><i class="fas fa-home"></i></div>

@@ -230,51 +230,16 @@ body {
     display: grid;
     grid-template-rows: auto 30px min-content;
     gap: 10px;
-}
-.pcImage {
-    background-image: url('./raspberry-pi-4-4gb.jpg');
-    background-position: center;
-    background-size: cover;
-    border-bottom: #f1f4f4 solid 1px;
-}
-.pcText {
-    text-transform: uppercase;
-    font-size: 25px;
-    font-family: RobotoRegular;
     display: flex;
     align-items: center;
-    justify-content: start;
-    margin-left: 10px;
+    justify-content: center;
+    font-size: 25px;
+    font-family: RobotoRegular;
 }
-.pcButtons {
-    display: grid;
-    grid-template-rows: repeat(1, 50px);
-    gap: 10px;
-    padding-left: 10px;
-    padding-bottom: 10px;
-    padding-right: 10px;
-}
-.pcButton {
-    background-color:#0a46e4;
-      display: grid;
-      grid-template-columns: 50px auto;
-      cursor: pointer;
-}
-.pcButtonIcon {
-display: flex;
-align-items: center;
-justify-content: center;
-font-size: 20px;
-color: white;
-}
-.pcButtonText {
-    display: flex;
-align-items: center;
-justify-content: start;
-text-transform: uppercase;
-font-family: RobotoRegular;
-font-size: 20px;
-color: white
+.pc:hover {
+    transform: scale(1.02);
+    cursor: pointer;
+    border: #0a46e4 solid 1px;
 }
 
 .cantReach {
@@ -345,7 +310,7 @@ text-align: center;
   .mediax {
       background-color: white;
       display: grid;
-      grid-template-rows: 50px 50px auto;
+      grid-template-rows: 50px 50px 50px auto;
       border: #f1f4f4 solid 1px;
       gap: 10px;
       padding: 10px;
@@ -389,4 +354,35 @@ font-size: 20px;
 }
 .mediaUp {
     border: #f1f4f4 solid 1px;
+}
+
+.pcAdd {
+    background-color: white;
+    border: #f1f4f4 solid 1px;
+    display: grid;
+    grid-template-rows: auto 30px min-content;
+    gap: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 200px;
+    font-family: RobotoRegular;
+}
+.pcAdd:hover {
+    transform: scale(1.02);
+    cursor: pointer;
+    border: #0a46e4 solid 1px;
+}
+.deletePcButton {
+    border: #f1f4f4 solid 1px;
+    background-color: #e4610a;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    font-family: RobotoRegular;
+    font-size: 15px;
+    cursor: pointer;
+    outline: none;
 }

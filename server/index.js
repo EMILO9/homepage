@@ -87,33 +87,44 @@ mongoClient.connect(
       })
     })
 
-    app.post('/upload', verifyToken, (req, res) => {
+    app.post('/addPc', verifyToken, (req, res) => {
       jwt.verify(req.token, secretKey, (err, authData) => {
-        // const stream = fs.createReadStream('http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4')
-        // const fileName = `media_${uuidv4()}`
         if (err) res.status(403).send('No access token set')
         else {
-          let convertToDate = (timestamp) => new Date(timestamp * 1000)
-          let d1 = convertToDate(authData.iat)
-          let d2 = convertToDate(1613433600)
-          console.log()
+          raspberrypi.insertOne({name: `PC_${uuidv4()}`,userAccess:[authData.email], "media":[]}).then(r => res.send(r.ops[0]))
         }
       })
-  })
-
-  app.get('/get-media', verifyToken, (req, res) => {
-    let s3 = new AWS.S3({accessKeyId: 'AKIAJH6ZPJJ4KGOPPAAQ', secretAccessKey: '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', Bucket: 'storemedia1'})
-    jwt.verify(req.token, secretKey, (err, authData) => {
-      if (err) res.status(403).send('No access token set')
-      else {
-        raspberrypi.find({userAccess: { $in: [authData.email] }}).toArray().then(r => res.send(r))
-      }
     })
-  })
+
+    app.delete('/deletePc/:id', verifyToken, (req, res) => {
+      jwt.verify(req.token, secretKey, (err, authData) => {
+        if (err) res.status(403).send('No access token set')
+        else {
+          if (authData.admin) raspberrypi.deleteOne({_id: objectID(req.params.id)}).then(r => res.send(r))
+          else {
+            raspberrypi.findOne({userAccess: { $in: [authData.email] }, _id: objectID(req.params.id)}).then(r => {
+              if (!r) res.status(403).send("You don't have access to that PC.")
+              else raspberrypi.deleteOne({_id: objectID(req.params.id)}).then(r => res.send(r))
+            })
+          }
+        }
+      })
+    })
+
+
 
     app.get('*', (req, res) => {
       res.sendFile(__dirname, '/dist/index.html');
     });
+
+    // app.post('/test', (req, res) => {
+    //   let s3 = new AWS.S3({accessKeyId: 'AKIAJH6ZPJJ4KGOPPAAQ', secretAccessKey: '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', Bucket: 'storemedia1'})
+    //   const fileContent = fs.readFileSync('./1915.jpg')
+    //   let uuid = `media_${uuidv4()}`
+    //   var params = {Bucket: 'storemedia1', Key: uuid, Body: fileContent, ACL: "public-read"};
+    //   console.log(params)
+    //   s3.upload(params, (err, data) => { res.send(data.Location)})
+    // })
 
   })
   .catch((error) => console.error(error));
@@ -143,3 +154,7 @@ function verifyToken(req, res, next) {
   }
 
 }
+
+
+
+// {"name":"Raspberry #1","userAccess":["test@gmail.com","emilberolsen@gmail.com"],"media":[]}
