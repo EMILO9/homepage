@@ -5,7 +5,12 @@
 npm install
 ```
 
-### Start server
+### Start server in development mode
 ```
-DEVELOPMENT: npm run dev || PRODUCTION: npm start
+npm run dev
+```
+
+### Start server in production mode
+```
+npm start
 ```
