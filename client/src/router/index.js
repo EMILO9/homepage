@@ -31,7 +31,7 @@ const routes = [
     component: Account
   },
   {
-    path: "/media",
+    path: "/media/",
     name: "Media",
     component: Media
   },
@@ -46,6 +46,8 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  if (to.name === 'Media' && !store.state.user) next({ name: 'Home' }) 
+  else next()
   if (to.name === 'Account' && !store.state.user) next({ name: 'Home' }) 
   else next()
 })

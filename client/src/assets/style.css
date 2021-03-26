@@ -188,7 +188,7 @@ body {
     background-color: white;
     border: #f1f4f4 solid 1px;
     display: grid;
-    grid-template-rows: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
 }
 .info {
     border-bottom: #f1f4f4 solid 1px;
@@ -310,7 +310,7 @@ text-align: center;
   .mediax {
       background-color: white;
       display: grid;
-      grid-template-rows: 50px 50px 50px auto;
+      grid-template-rows: 50px 50px auto;
       border: #f1f4f4 solid 1px;
       gap: 10px;
       padding: 10px;
@@ -339,21 +339,25 @@ text-align: center;
     font-size: 15px;
     cursor: pointer;
 }
-.fa-cloud-upload-alt {
-margin-left: 5px;
-font-size: 20px;
-}
 
 .mediaUploaded {
     border: #f1f4f4 solid 1px;
     gap: 10px;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(1, 1fr);
     padding: 10px;
-    grid-auto-rows: 200px;
+    grid-auto-rows: 60px;
 }
 .mediaUp {
     border: #f1f4f4 solid 1px;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    padding: 10px;
+    text-transform: uppercase;
+    font-family: RobotoRegular;
+    font-size: 25px;
+    color: white;
 }
 
 .pcAdd {
@@ -385,4 +389,62 @@ font-size: 20px;
     font-size: 15px;
     cursor: pointer;
     outline: none;
+}
+.updateButton {
+    border: #f1f4f4 solid 1px;
+    background-color: #cea800 ;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    font-family: RobotoRegular;
+    font-size: 15px;
+    cursor: pointer;
+    outline: none;
+}
+
+.noMedia {
+    border: #f1f4f4 solid 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    height: 200px;
+    font-family: RobotoRegular;
+    font-size: 30px;
+}
+.mediaButtons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+.mediaFile {
+    border: #f1f4f4 solid 1px;
+    background-color: transparent;
+    padding: 5px;
+    font-family: RobotoRegular;
+    font-size: 15px;
+    outline: none;
+}
+
+.mediaFileView {
+    color: white;
+    border: #f1f4f4 solid 1px;
+    background-color: #0a46e4;
+    padding: 5px;
+    font-family: RobotoRegular;
+    font-size: 15px;
+    outline: none;
+    cursor: pointer;
+}
+.mediaFileDelete {
+    color: white;
+    border: #f1f4f4 solid 1px;
+    background-color: #e4610a;
+    padding: 5px;
+    font-family: RobotoRegular;
+    font-size: 15px;
+    outline: none;
+    cursor: pointer;
 }

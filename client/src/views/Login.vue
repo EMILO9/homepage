@@ -30,6 +30,7 @@ export default {
           password: this.password,
         })
         .then((r) => {
+          console.log(r.data)
           Vue.$toast.open({
             message: `${r.status}: Successfully logged in`,
             type: 'success',
