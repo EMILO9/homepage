@@ -1,9 +1,6 @@
 require('dotenv').config()
 const express = require('express')
 const app = express()
-const port = process.env.PORT
-const connectionString = process.env.CONNECTION_STRING
-const secretKey = process.env.SECRET_KEY
 const morgan = require('morgan')
 const cors = require('cors')
 const mongoClient = require('mongodb').MongoClient
@@ -18,7 +15,7 @@ const { v4: uuidv4 } = require('uuid');
 const AWS = require('aws-sdk')
 var multer = require('multer');
 var multerS3 = require('multer-s3')
-let s3 = new AWS.S3({accessKeyId: 'AKIAJH6ZPJJ4KGOPPAAQ', secretAccessKey: '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', Bucket: 'storemedia1'})
+let s3 = new AWS.S3({accessKeyId: process.env.ACCESS_KEY_ID_AWS, secretAccessKey: process.env.SECRET_ACCESS_KEY_AWS, Bucket: process.env.BUCKET})
 // https://stackoverflow.com/questions/56197004/upload-image-to-s3-from-node-js
 var upload = multer({
   limits: {
@@ -27,7 +24,7 @@ var upload = multer({
   },
   storage: multerS3({
     s3: s3,
-    bucket: 'storemedia1',
+    bucket: process.env.BUCKET,
     acl: 'public-read',
     contentType: multerS3.AUTO_CONTENT_TYPE,
     key: function (req, file, cb) {
@@ -35,7 +32,6 @@ var upload = multer({
     }
   })
 })
-const { getVideoDurationInSeconds } = require('get-video-duration')
 
 
 //Middleware
@@ -44,10 +40,10 @@ app.use(cors())
 app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, '/../client/dist')));
 
-app.listen(port, () => console.log(`Server listening at http://localhost:${port}`))
+app.listen(process.env.PORT, () => console.log(`Server listening at http://localhost:${process.env.PORT}`))
 
 mongoClient.connect(
-  connectionString,
+  process.env.CONNECTION_STRING_MONGODB,
   { useUnifiedTopology: true }
 )
   .then((client) => {
@@ -83,7 +79,7 @@ mongoClient.connect(
           else {
             let { _id, email} = response
             let user = { _id, email}
-            jwt.sign(user, secretKey, {expiresIn: '2h'},(err, token) => {
+            jwt.sign(user, process.env.SECRET_KEY_JWT, {expiresIn: '2h'},(err, token) => {
               res.status(200).send({ token, user })
             })
           }
@@ -92,7 +88,7 @@ mongoClient.connect(
     })
 
     app.get('/private', verifyToken, (req, res) => {
-      jwt.verify(req.token, secretKey, (err, authData) => {
+      jwt.verify(req.token, process.env.SECRET_KEY_JWT, (err, authData) => {
         if (err) res.status(403).send('No access token set')
         else {
             raspberrypi.find({userAccess: { $in: [authData.email] }}).toArray().then(r => {
@@ -103,7 +99,7 @@ mongoClient.connect(
     })
 
     app.post('/addPc', verifyToken, (req, res) => {
-      jwt.verify(req.token, secretKey, (err, authData) => {
+      jwt.verify(req.token, process.env.SECRET_KEY_JWT, (err, authData) => {
         if (err) res.status(403).send('No access token set')
         else {
           raspberrypi.insertOne({name: `PC_${uuidv4()}`,userAccess:[authData.email], "media":[]}).then(r => res.send(r.ops[0]))
@@ -112,7 +108,7 @@ mongoClient.connect(
     })
 
     app.delete('/deletePc/:id', verifyToken, (req, res) => {
-      jwt.verify(req.token, secretKey, (err, authData) => {
+      jwt.verify(req.token, process.env.SECRET_KEY_JWT, (err, authData) => {
         if (err) res.status(403).send('No access token set')
         else {
             raspberrypi.findOne({userAccess: { $in: [authData.email] }, _id: objectID(req.params.id)}).then(r => {
@@ -132,28 +128,8 @@ mongoClient.connect(
       })
     })
 
-// Doesnt add a new document on mongodb, but still uploads the file to S3.
-// https://stackoverflow.com/questions/64358976/express-multer-validate-request-before-uploading-file
-    
-// app.post('/addMedia/:pc', verifyToken, upload.single('file'), (req, res) => {
-//       jwt.verify(req.token, secretKey, (err, authData) => {
-//         if (err) res.status(403).send('No access token set')
-//         else {
-//           raspberrypi.findOne({userAccess: { $in: [authData.email] }, _id: objectID(req.params.pc)}).then(r => {
-//             if (!r) res.status(403).send("You don't have access to that PC.")
-//             else {
-//               raspberrypi.updateOne(
-//                 { _id: objectID(req.params.pc) },
-//                 { $push: { media: { url: req.file.location, type: req.file.mimetype, duration: 3000, name: req.file.originalname, key: req.file.key } } }
-//              ).then(r => res.send(r))
-//             }
-//           })
-//         }
-//       })
-//     })
-
 let validation = (req, res, next) => {
-  jwt.verify(req.token, secretKey, (err, authData) => {
+  jwt.verify(req.token, process.env.SECRET_KEY_JWT, (err, authData) => {
     if (err) res.status(403).send('No access token set')
     else {
       raspberrypi.findOne({userAccess: { $in: [authData.email] }, _id: objectID(req.params.pc)}).then(r => {
@@ -171,14 +147,14 @@ app.post('/addMedia/:pc', verifyToken, validation, upload.single('file'), (req, 
 })
 
     app.delete('/deleteFile/:key/:id', verifyToken, (req, res) => {
-      jwt.verify(req.token, secretKey, (err, authData) => {
+      jwt.verify(req.token, process.env.SECRET_KEY_JWT, (err, authData) => {
         if (err) res.status(403).send('No access token set')
         else {
           raspberrypi.findOne({userAccess: { $in: [authData.email] }, _id: objectID(req.params.id)}).then(r => {
             if (!r) res.status(403).send("You don't have access to that PC.")
             else {
               var params = {
-                Bucket: "storemedia1", 
+                Bucket: process.env.BUCKET, 
                 Key: req.params.key
                };
                s3.deleteObject(params, function(err, data) {
@@ -193,7 +169,7 @@ app.post('/addMedia/:pc', verifyToken, validation, upload.single('file'), (req, 
     })
 
     app.put('/updatePc/:id', verifyToken, (req, res) => {
-      jwt.verify(req.token, secretKey, (err, authData) => {
+      jwt.verify(req.token, process.env.SECRET_KEY_JWT, (err, authData) => {
         if (err) res.status(403).send('No access token set')
         else {
           raspberrypi.findOne({userAccess: { $in: [authData.email] }, _id: objectID(req.params.id)}).then(r => {
@@ -215,7 +191,7 @@ app.post('/addMedia/:pc', verifyToken, validation, upload.single('file'), (req, 
 
     app.post('/expireTime', (req, res) => {
       let token = req.body.token
-      jwt.verify(token,secretKey, (err, decoded) => { 
+      jwt.verify(token, process.env.SECRET_KEY_JWT, (err, decoded) => { 
         if (err) console.log(err)
         else {
           let difference = (a, b) => { return Math.abs(a - b); } // Difference in seconds
